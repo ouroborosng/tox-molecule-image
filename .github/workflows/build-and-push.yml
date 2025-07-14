@@ -79,6 +79,8 @@ jobs:
   update-lockfile:
     runs-on: ubuntu-latest
     if: github.event.inputs.update_lockfile == 'true' || github.event.schedule
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
@@ -118,6 +120,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-version, update-lockfile]
     if: always() && needs.check-version.outputs.version_changed == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' && (needs.update-lockfile.result == 'success' || needs.update-lockfile.result == 'skipped')
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
