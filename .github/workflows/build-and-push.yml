@@ -225,6 +225,7 @@ jobs:
     steps:
       - name: Debug event and ref
         run: |
+          echo "build result = ${{ needs.build.result }}"
           echo "github.event_name=${{ github.event_name }}"
           echo "github.ref=${{ github.ref }}"
 
