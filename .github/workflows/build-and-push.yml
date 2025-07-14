@@ -23,11 +23,6 @@ on:
         required: false
         default: false
         type: boolean
-      debug_enabled:
-        description: 'Enable debug job'
-        required: false
-        default: false
-        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -36,13 +31,12 @@ env:
 jobs:
 
   debug:
-      if: ${{ github.event.inputs.debug_enabled == 'true' }}
-      runs-on: ubuntu-latest
-      steps:
-        - name: Debug event and ref
-          run: |
-            echo "github.event_name=${{ github.event_name }}"
-            echo "github.ref=${{ github.ref }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug event and ref
+        run: |
+          echo "github.event_name=${{ github.event_name }}"
+          echo "github.ref=${{ github.ref }}"
 
   check-version:
     runs-on: ubuntu-latest
