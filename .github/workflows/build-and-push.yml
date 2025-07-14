@@ -30,14 +30,6 @@ env:
 
 jobs:
 
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug event and ref
-        run: |
-          echo "github.event_name=${{ github.event_name }}"
-          echo "github.ref=${{ github.ref }}"
-
   check-version:
     runs-on: ubuntu-latest
     outputs:
@@ -225,6 +217,15 @@ jobs:
       with:
         name: sbom
         path: sbom.spdx.json
+
+  debug:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Debug event and ref
+        run: |
+          echo "github.event_name=${{ github.event_name }}"
+          echo "github.ref=${{ github.ref }}"
 
   test:
     runs-on: ubuntu-latest
