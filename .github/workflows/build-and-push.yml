@@ -208,7 +208,7 @@ jobs:
       if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       uses: anchore/sbom-action@v0
       with:
-        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.digest }}
+        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.build.outputs.digest }}
         format: spdx-json
         output-file: sbom.spdx.json
 
