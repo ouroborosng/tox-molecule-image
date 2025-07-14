@@ -181,7 +181,7 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
-          type=pep440,pattern={{version}}
+          type=pep440,pattern={{version}},value=${{ steps.version.outputs.version }}
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
           org.opencontainers.image.title=Molecule Tox Runner
