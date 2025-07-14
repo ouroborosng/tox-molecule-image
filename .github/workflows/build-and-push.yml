@@ -209,7 +209,7 @@ jobs:
       with:
         image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
         format: spdx-json
-        output-file: sbom.spdx.json
+        upload-artifact: false
 
     - name: Upload SBOM
       if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
