@@ -294,7 +294,7 @@ jobs:
         docker run --rm --platform ${{ matrix.platform }} $IMAGE yamllint --version
 
         # Test entrypoint
-        docker run --rm --platform $IMAGE
+        docker run --rm --platform ${{ matrix.platform }} $IMAGE
 
   security-scan:
     permissions:
