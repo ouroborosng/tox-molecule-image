@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM python:3.12-slim as builder
+FROM python:3.12-slim as builder
 
 # Improve Python behavior in containers:
 # - Disable stdout/stderr buffering
@@ -32,7 +32,7 @@ COPY docker/uv.lock /tmp/uv.lock
 WORKDIR /tmp
 RUN uv sync --frozen --no-dev
 
-FROM --platform=$TARGETPLATFORM python:3.12-slim
+FROM python:3.12-slim
 
 LABEL maintainer="ouroborosng"
 LABEL description="Docker image for Ansible Molecule testing with tox"
