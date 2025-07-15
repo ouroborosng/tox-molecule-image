@@ -247,6 +247,10 @@ jobs:
 
     - name: Test Docker image
       run: |
+        # debug entrypoint.sh
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ls -la /usr/local/bin/entrypoint.sh
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest file /usr/local/bin/entrypoint.sh
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest head -1 /usr/local/bin/entrypoint.sh | od -c
 
         # Test basic functionality
         docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest tox --version
