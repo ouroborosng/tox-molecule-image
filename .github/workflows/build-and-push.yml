@@ -190,6 +190,7 @@ jobs:
         format: spdx-json
         output-file: sbom.spdx.json
         upload-artifact: false
+        platform: ${{ matrix.platform }}
 
     - name: Upload SBOM
       uses: actions/upload-artifact@v4
