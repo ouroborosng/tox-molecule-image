@@ -3,16 +3,8 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'docker/**'
-      - '.github/workflows/build-and-push.yml'
-      - 'VERSION'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'docker/**'
-      - '.github/workflows/build-and-push.yml'
-      - 'VERSION'
   schedule:
     # Auto build at 2 AM every Sunday
     - cron: '0 2 * * 0'
