@@ -26,8 +26,8 @@ RUN uv venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy Python dependency definitions for layer caching and faster install
-COPY docker/pyproject.toml /tmp/pyproject.toml
-COPY docker/uv.lock /tmp/uv.lock
+COPY pyproject.toml /tmp/pyproject.toml
+COPY uv.lock /tmp/uv.lock
 
 WORKDIR /tmp
 RUN uv sync --frozen --no-dev
@@ -62,7 +62,7 @@ RUN groupadd -g 1001 runner && \
     chown -R runner:runner /home/runner
 
 # Copy entrypoint script
-COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set workspace dir
