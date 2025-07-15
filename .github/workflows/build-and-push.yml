@@ -19,7 +19,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PLATFORM_MATRIX: '["linux/amd64", "linux/arm64"]'
 
 jobs:
 
@@ -138,7 +137,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
+        platform: [linux/arm64, linux/amd64]
 
     outputs:
       image-labels: ${{ steps.meta.outputs.labels }}
@@ -163,7 +162,7 @@ jobs:
         tags: |
           type=ref,event=branch
           type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}
-          type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}-${{ matrix.platform}}
+          type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}-${{ matrix.platform.split('/')[-1] }}
           type=raw,value=v${{ needs.check-version.outputs.version }}
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
@@ -200,11 +199,12 @@ jobs:
 
   generate-sbom:
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [check-version, build]
     if: always()
     strategy:
       matrix:
-        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
+        arch: [amd64, arm64]
+
     steps:
     - name: Extract metadata
       id: meta
@@ -215,11 +215,10 @@ jobs:
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
       with:
-        image: ${{ needs.check-version.outputs.version }}-${{ matrix.platform }}
+        image: ${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
         format: spdx-json
-        output-file: sbom-${{ matrix.platform }}.spdx.json
+        output-file: sbom-${{ matrix.arch }}.spdx.json
         upload-artifact: true
-        platform: ${{ matrix.platform }}
 
   debug:
     runs-on: ubuntu-latest
@@ -238,7 +237,8 @@ jobs:
     if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
+        arch: [amd64, arm64]
+        platform: [linux/amd64, linux/arm64]
 
     steps:
     - name: Checkout repository
@@ -250,7 +250,7 @@ jobs:
     - name: Test Docker image
       run: |
         # Debug testing platform log
-        IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.platform}}
+        IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch}}
         echo "Image to test: $IMAGE"
 
         echo "Testing on platform: ${{ matrix.platform }}"
@@ -285,13 +285,13 @@ jobs:
     if: always() && github.event_name != 'pull_request'
     strategy:
       matrix:
-        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
+        arch: [amd64, arm64]
 
     steps:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.platform}}
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch}}
         format: 'sarif'
         output: 'trivy-results.sarif'
 
