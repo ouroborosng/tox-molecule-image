@@ -314,13 +314,9 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        skip-scan: true
-
-    - name: Run Trivy scan with platform
-      run: |
-        IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}"
-        echo "Scanning image: $IMAGE"
-        trivy image --platform=linux/${{ matrix.arch }} --format sarif --output trivy-results-${{ matrix.arch }}.sarif "$IMAGE"
+        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch}}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
