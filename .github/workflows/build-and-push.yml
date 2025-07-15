@@ -247,17 +247,15 @@ jobs:
 
     - name: Test Docker image
       run: |
-        # Extract platform-specific image
-        PLATFORM_TAG=$(echo "${{ matrix.platform }}" | tr '/' '-')
 
         # Test basic functionality
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} tox --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} molecule --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} ansible-lint --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} yamllint --version
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest tox --version
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest molecule --version
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ansible-lint --version
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest yamllint --version
 
         # Test entrypoint
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }}
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
   security-scan:
     permissions:
