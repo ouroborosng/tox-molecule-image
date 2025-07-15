@@ -41,6 +41,7 @@ ENV PYTHONUNBUFFERED=1 \
     PATH="/opt/.venv/bin:$PATH"
 
 RUN apt-get update && apt-get install -y \
+    bash \
     curl \
     git \
     docker.io \
