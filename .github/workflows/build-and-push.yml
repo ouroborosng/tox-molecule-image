@@ -19,6 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  PLATFORM_MATRIX: '["linux/amd64", "linux/arm64"]'
 
 jobs:
 
@@ -137,7 +138,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
 
     outputs:
       image-labels: ${{ steps.meta.outputs.labels }}
@@ -203,7 +204,7 @@ jobs:
     if: always()
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
     steps:
     - name: Extract metadata
       id: meta
@@ -237,7 +238,7 @@ jobs:
     if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
 
     steps:
     - name: Checkout repository
@@ -284,7 +285,7 @@ jobs:
     if: always() && github.event_name != 'pull_request'
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
 
     steps:
     - name: Run Trivy vulnerability scanner
