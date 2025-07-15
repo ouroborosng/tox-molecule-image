@@ -318,9 +318,10 @@ jobs:
         IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
         echo "Scanning $IMAGE"
         docker run --rm \
+          -v ${{ github.workspace }}:/report \
           ghcr.io/aquasecurity/trivy:0.64.1 \
           image --format sarif \
-          --output trivy-results-${{ matrix.arch }}.sarif \
+          --output /report/trivy-results-${{ matrix.arch }}.sarif \
           --platform linux/${{ matrix.arch }} \
           --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
           "$IMAGE"
