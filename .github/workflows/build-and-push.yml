@@ -259,6 +259,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -311,9 +314,13 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch}}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+        skip-scan: true
+
+    - name: Run Trivy scan with platform
+      run: |
+        IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}"
+        echo "Scanning image: $IMAGE"
+        trivy image --platform=linux/${{ matrix.arch }} --format sarif --output trivy-results-${{ matrix.arch }}.sarif "$IMAGE"
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
