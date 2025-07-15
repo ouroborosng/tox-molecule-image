@@ -22,14 +22,13 @@ RUN apt-get update && apt-get install -y \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
-
 # Copy Python dependency definitions for layer caching and faster install
-COPY pyproject.toml /tmp/pyproject.toml
-COPY uv.lock /tmp/uv.lock
+COPY pyproject.toml /opt/pyproject.toml
+COPY uv.lock /opt/uv.lock
 
-WORKDIR /tmp
+WORKDIR /opt
 # Install production dependencies from lock file into active venv
-RUN uv sync --frozen --no-dev --active
+RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim
 
@@ -39,7 +38,7 @@ LABEL version="1.0.0"
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/opt/venv/bin:$PATH"
+    PATH="/opt/.venv/bin:$PATH"
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -51,7 +50,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Copy the prebuilt virtual environment with installed dependencies
-COPY --from=builder /tmp/.venv /opt/venv
+COPY --from=builder /opt/.venv /opt/.venv
 
 # Create runner user
 RUN groupadd -g 1001 runner && \
@@ -66,6 +65,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set workspace dir
 WORKDIR /workspace
+RUN chown -R runner:runner /workspace
 
 # Change to none root user as default user
 USER runner
