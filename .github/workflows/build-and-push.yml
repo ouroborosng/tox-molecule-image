@@ -225,9 +225,15 @@ jobs:
       with:
         image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ steps.extract-arch.outputs.arch }}
         format: spdx-json
-        output-file: sbom-${{ matrix.arch }}.spdx.json
-        upload-artifact: true
+        output-file: sbom-${{ steps.extract-arch.outputs.arch }}.spdx.json
+        upload-artifact: false
         platform:  ${{ matrix.platform }}
+
+    - name: Upload SBOM
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom-${{ steps.extract-arch.outputs.arch }}.json
+        path: sbom-${{ steps.extract-arch.outputs.arch }}.spdx.json
 
   debug:
     runs-on: ubuntu-latest
