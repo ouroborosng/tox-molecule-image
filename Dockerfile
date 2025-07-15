@@ -30,7 +30,8 @@ COPY pyproject.toml /tmp/pyproject.toml
 COPY uv.lock /tmp/uv.lock
 
 WORKDIR /tmp
-RUN uv sync --frozen --no-dev
+# Install production dependencies from lock file into active venv
+RUN uv sync --frozen --no-dev --active
 
 FROM python:3.12-slim
 
