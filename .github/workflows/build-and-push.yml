@@ -313,16 +313,18 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
 
-    - name: Scan remote image with Trivy (arm64)
+    - name: Scan ${{ matrix.arch }} image with Trivy
       run: |
+        IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
+        echo "Scanning $IMAGE"
         trivy image \
           --format sarif \
-          --output trivy-results-arm64.sarif \
+          --output trivy-results-${{ matrix.arch }}.sarif \
           --platform linux/${{ matrix.arch }} \
           --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
+          "$IMAGE"
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: 'trivy-results.sarif'
+        sarif_file: 'trivy-results-${{ matrix.arch }}.sarif'
