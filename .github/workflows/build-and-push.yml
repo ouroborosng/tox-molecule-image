@@ -249,8 +249,25 @@ jobs:
       run: |
         # debug entrypoint.sh
         docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ls -la /usr/local/bin/entrypoint.sh
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest file /usr/local/bin/entrypoint.sh
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest head -1 /usr/local/bin/entrypoint.sh | od -c
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest head -1 /usr/local/bin/entrypoint.sh
+
+        # test entrypoint
+        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+        # testing platform log
+        echo "Testing on platform: ${{ matrix.platform }}"
+        ARCH=$(docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest uname -m)
+        echo "Container architecture: $ARCH"
+
+        if [[ "${{ matrix.platform }}" == "linux/amd64" && "$ARCH" != "x86_64" ]]; then
+          echo "ERROR: Expected x86_64 for amd64 platform, got $ARCH"
+          exit 1
+        fi
+
+        if [[ "${{ matrix.platform }}" == "linux/arm64" && "$ARCH" != "aarch64" ]]; then
+          echo "ERROR: Expected aarch64 for arm64 platform, got $ARCH"
+          exit 1
+        fi
 
         # Test basic functionality
         docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest tox --version
