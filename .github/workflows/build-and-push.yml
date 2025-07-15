@@ -167,7 +167,7 @@ jobs:
           type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}
           type=raw,value=${{ needs.check-version.outputs.version }}-${{ steps.extract-arch.outputs.arch }}
           type=raw,value=v${{ needs.check-version.outputs.version }}
-          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=latest-${{ steps.extract-arch.outputs.arch }},enable={{is_default_branch}}
         labels: |
           org.opencontainers.image.title=Molecule Tox Runner
           org.opencontainers.image.description=Docker image for Ansible Molecule testing with tox (built with uv)
@@ -222,12 +222,13 @@ jobs:
 
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
+      env:
+        SYFT_PLATFORM: ${{ matrix.platform }}
       with:
         image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ steps.extract-arch.outputs.arch }}
         format: spdx-json
         output-file: sbom-${{ steps.extract-arch.outputs.arch }}.spdx.json
         upload-artifact: false
-        platform:  ${{ matrix.platform }}
 
     - name: Upload SBOM
       uses: actions/upload-artifact@v4
