@@ -307,15 +307,19 @@ jobs:
         arch: [amd64, arm64]
 
     steps:
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
     - name: Scan ${{ matrix.arch }} image with Trivy
       run: |
         IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
         echo "Scanning $IMAGE"
-        trivy image \
-          --format sarif \
+        docker run --rm \
+          ghcr.io/aquasecurity/trivy:0.64.1 \
+          image --format sarif \
           --output trivy-results-${{ matrix.arch }}.sarif \
           --platform linux/${{ matrix.arch }} \
           --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
