@@ -163,6 +163,7 @@ jobs:
         tags: |
           type=ref,event=branch
           type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}
+          type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}-${{ matrix.platform}}
           type=raw,value=v${{ needs.check-version.outputs.version }}
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
@@ -249,8 +250,11 @@ jobs:
     - name: Test Docker image
       run: |
         # Debug testing platform log
+        IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.platform}}
+        echo "Image to test: $IMAGE"
+
         echo "Testing on platform: ${{ matrix.platform }}"
-        ARCH=$(docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest uname -m)
+        ARCH=$(docker run --rm --platform ${{ matrix.platform }} $IMAGE uname -m)
         echo "Container architecture: $ARCH"
 
         if [[ "${{ matrix.platform }}" == "linux/amd64" && "$ARCH" != "x86_64" ]]; then
@@ -264,13 +268,13 @@ jobs:
         fi
 
         # Test basic functionality
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest tox --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest molecule --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ansible-lint --version
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest yamllint --version
+        docker run --rm --platform ${{ matrix.platform }} $IMAGE tox --version
+        docker run --rm --platform ${{ matrix.platform }} $IMAGE molecule --version
+        docker run --rm --platform ${{ matrix.platform }} $IMAGE ansible-lint --version
+        docker run --rm --platform ${{ matrix.platform }} $IMAGE yamllint --version
 
         # Test entrypoint
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        docker run --rm --platform $IMAGE
 
   security-scan:
     permissions:
