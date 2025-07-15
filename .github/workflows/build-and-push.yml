@@ -135,9 +135,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
 
     outputs:
-      image-digest: ${{ steps.build.outputs.digest }}
       image-tags: ${{ steps.meta.outputs.tags }}
       image-labels: ${{ steps.meta.outputs.labels }}
 
@@ -153,15 +155,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Read VERSION file
-      id: version
-      run: |
-        if [ -f VERSION ]; then
-          echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
-        else
-          echo "version=latest" >> $GITHUB_OUTPUT
-        fi
-
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -169,8 +162,8 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
-          type=pep440,pattern={{version}},value=${{ steps.version.outputs.version }}
-          type=raw,value=v${{ steps.version.outputs.version }}
+          type=pep440,pattern={{version}},value=${{ needs.check-version.outputs.version }}
+          type=raw,value=v${{ needs.check-version.outputs.version }}
           type=raw,value=latest,enable={{is_default_branch}}
         labels: |
           org.opencontainers.image.title=Molecule Tox Runner
@@ -188,7 +181,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/amd64,linux/arm64
+        platforms: ${{ matrix.platform }}
 
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
@@ -232,14 +225,7 @@ jobs:
 
     - name: Test Docker image
       run: |
-        # debug entrypoint.sh
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ls -la /usr/local/bin/entrypoint.sh
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest head -1 /usr/local/bin/entrypoint.sh
-
-        # test entrypoint
-        docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-        # testing platform log
+        # Debug testing platform log
         echo "Testing on platform: ${{ matrix.platform }}"
         ARCH=$(docker run --rm --platform ${{ matrix.platform }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest uname -m)
         echo "Container architecture: $ARCH"
