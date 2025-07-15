@@ -246,6 +246,7 @@ jobs:
           echo "build result = ${{ needs.build.result }}"
           echo "github.event_name=${{ github.event_name }}"
           echo "github.ref=${{ github.ref }}"
+          echo "needs.build.outputs=${{ needs.build.outputs }}"
 
   test:
     runs-on: ubuntu-latest
