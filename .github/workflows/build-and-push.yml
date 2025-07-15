@@ -140,7 +140,6 @@ jobs:
         platform: [linux/amd64, linux/arm64]
 
     outputs:
-      image-tags: ${{ steps.meta.outputs.tags }}
       image-labels: ${{ steps.meta.outputs.labels }}
 
     steps:
@@ -215,7 +214,7 @@ jobs:
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
       with:
-        image: ${{ steps.meta.outputs.tags }}
+        image: ${{ needs.check-version.outputs.version }}-${{ matrix.platform }}
         format: spdx-json
         output-file: sbom-${{ matrix.platform }}.spdx.json
         upload-artifact: true
