@@ -222,6 +222,9 @@ jobs:
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
       env:
+        # Set the SYFT_PLATFORM environment variable to ensure Syft (used internally by sbom-action)
+        # correctly pulls the image for the target architecture (e.g., linux/arm64).
+        # The default GitHub runner (usually linux/amd64) may cause Syft to fetch the wrong image variant
         SYFT_PLATFORM: ${{ matrix.platform }}
       with:
         image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ steps.extract-arch.outputs.arch }}
@@ -313,6 +316,10 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    # Using Trivy via Docker container instead of `aquasecurity/trivy-action`
+    # because the trivy-action does not allow specifying `--platform` directly,
+    # which is required to scan multi-arch images (e.g., arm64) correctly.
+    # This approach also gives full control over CLI options and improves portability.
     - name: Scan ${{ matrix.arch }} image with Trivy
       run: |
         IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
