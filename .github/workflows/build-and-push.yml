@@ -138,7 +138,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
+        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
 
     outputs:
       image-labels: ${{ steps.meta.outputs.labels }}
@@ -204,7 +204,7 @@ jobs:
     if: always()
     strategy:
       matrix:
-        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
+        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
     steps:
     - name: Extract metadata
       id: meta
@@ -238,7 +238,7 @@ jobs:
     if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
+        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
 
     steps:
     - name: Checkout repository
@@ -285,7 +285,7 @@ jobs:
     if: always() && github.event_name != 'pull_request'
     strategy:
       matrix:
-        platform: ${{ fromJson(env.PLATFORM_MATRIX) }}
+        platform: ${{ fromJson(vars.PLATFORM_MATRIX) }}
 
     steps:
     - name: Run Trivy vulnerability scanner
