@@ -34,7 +34,6 @@ RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim
 
-# 設定標籤
 LABEL maintainer="ouroborosng"
 LABEL description="Docker image for Ansible Molecule testing with tox"
 LABEL version="1.0.0"
@@ -66,14 +65,13 @@ RUN groupadd -g 1001 runner && \
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# 設定工作目錄
+# Set workspace dir
 WORKDIR /workspace
 
-# 切換到非 root 使用者
+# Change to none root user as default user
 USER runner
 
-# 設定入口點
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# 預設指令
+# Default command
 CMD ["tox", "--help"]
