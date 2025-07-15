@@ -142,7 +142,6 @@ jobs:
       image-labels: ${{ steps.meta.outputs.labels }}
 
     steps:
-
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -207,9 +206,14 @@ jobs:
     if: always()
     strategy:
       matrix:
-        arch: [amd64, arm64]
+        platform: [linux/arm64, linux/amd64]
 
     steps:
+    - name: Extract arch from platform
+      id: extract-arch
+      run: |
+        echo "arch=$(echo '${{ matrix.platform }}' | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -219,10 +223,11 @@ jobs:
     - name: Generate SBOM
       uses: anchore/sbom-action@v0
       with:
-        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
+        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ steps.extract-arch.outputs.arch }}
         format: spdx-json
         output-file: sbom-${{ matrix.arch }}.spdx.json
         upload-artifact: true
+        platform:  ${{ matrix.platform }}
 
   debug:
     runs-on: ubuntu-latest
