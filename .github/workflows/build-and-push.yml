@@ -314,11 +314,15 @@ jobs:
     steps:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch}}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-        docker-host: remote
+
+    - name: Scan remote image with Trivy (arm64)
+      run: |
+        trivy image \
+          --format sarif \
+          --output trivy-results-arm64.sarif \
+          --platform linux/${{ matrix.arch }} \
+          --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}-${{ matrix.arch }}
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
