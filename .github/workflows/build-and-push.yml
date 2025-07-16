@@ -264,17 +264,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-version, build]
     if: always() && github.event_name != 'pull_request'
-    strategy:
-      matrix:
-        arch: [amd64, arm64]
 
     steps:
-    # - name: Set up QEMU
-    #   uses: docker/setup-qemu-action@v3
-
-    # - name: Set up Docker Buildx
-    #   uses: docker/setup-buildx-action@v3
-
     - name: Generate SBOM with Trivy
       uses: aquasecurity/trivy-action@0.28.0
       with:
@@ -290,23 +281,6 @@ jobs:
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
         ignore-unfixed: true
-
-    # Using Trivy via Docker container instead of `aquasecurity/trivy-action`
-    # because the trivy-action does not allow specifying `--platform` directly,
-    # which is required to scan multi-arch images (e.g., arm64) correctly.
-    # This approach also gives full control over CLI options and improves portability.
-    # - name: Scan ${{ matrix.arch }} image with Trivy
-    #   run: |
-    #     IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.check-version.outputs.version }}
-    #     echo "Scanning $IMAGE"
-    #     docker run --rm \
-    #       -v ${{ github.workspace }}:/report \
-    #       ghcr.io/aquasecurity/trivy:0.64.1 \
-    #       image --format sarif \
-    #       --output /report/trivy-results-${{ matrix.arch }}.sarif \
-    #       --platform linux/${{ matrix.arch }} \
-    #       --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
-    #       "$IMAGE"
 
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v3
