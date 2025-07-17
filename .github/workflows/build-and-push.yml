@@ -273,6 +273,12 @@ jobs:
         format: cyclonedx
         output: 'sbom.cdx.json'
 
+    - name: Upload SBOM artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom.cdx.json
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.28.0
       with:
