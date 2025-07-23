@@ -27,6 +27,9 @@ autolabeler:
     title:
       - '/fix:/i'
       - '/bug:/i'
+  - label: 'refactor'
+    title:
+      - '/refactor:/i'
 template: |
   ## 🚀 What’s Changed in $RESOLVED_VERSION
 
