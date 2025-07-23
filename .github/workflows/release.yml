@@ -1,0 +1,57 @@
+name: Draft Release and Release
+
+on:
+  # Pull_request event is required only for autolabeler
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: [main]
+
+jobs:
+
+  check-version:
+    if: |
+      (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'main')
+      )
+    uses: ./.github/workflows/version-check.yml
+
+  release-draft:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+      # The release-drafter default config file is at `.github/release-drafter.yml`
+      - uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_release:
+    runs-on: ubuntu-latest
+    needs: [check-version]
+    if: |
+      needs.check-version.outputs.version_changed == 'true' &&
+      (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'main')
+      )
+    permissions:
+      contents: write
+
+    steps:
+      - name: Extract version
+        run: echo "VER=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: "v${{ needs.check-version.outputs.version }}"
+          name: "v${{ needs.check-version.outputs.version }}"
+          version: "v${{ needs.check-version.outputs.version }}"
+          publish: true

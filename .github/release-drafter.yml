@@ -1,0 +1,36 @@
+# The release-drafter/release-drafter action config file
+---
+# name-template: 'v$RESOLVED_VERSION'
+# tag-template: 'v$RESOLVED_VERSION'
+commitish: main
+version-resolver:
+  major:
+    labels: ['major']
+  minor:
+    labels: ['minor', 'feature']
+  patch:
+    labels: ['bug', 'patch', 'fix']
+  default: patch
+categories:
+  - title: '✨ Features'
+    labels: ['feature']
+  - title: '🐛 Bug Fixes'
+    labels: ['bug']
+exclude-labels: ['skip-changelog']
+autolabeler:
+  - label: 'feature'
+    title:
+      - '/feat:/i'
+      - '/feature:/i'
+      - '/features:/i'
+  - label: 'bug'
+    title:
+      - '/fix:/i'
+      - '/bug:/i'
+template: |
+  ## 🚀 What’s Changed in $RESOLVED_VERSION
+
+  $CHANGES
+
+  ---
+  _Compare_: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
