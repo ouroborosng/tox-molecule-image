@@ -30,6 +30,9 @@ autolabeler:
   - label: 'enhancement'
     title:
       - '/refactor:/i'
+      - '/refactoring:/i'
+      - '/enhance:/i'
+      - '/enhancement:/i'
 template: |
   ## 🚀 What’s Changed in $RESOLVED_VERSION
 
