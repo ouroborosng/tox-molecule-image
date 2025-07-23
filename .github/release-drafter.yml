@@ -27,7 +27,7 @@ autolabeler:
     title:
       - '/fix:/i'
       - '/bug:/i'
-  - label: 'refactor'
+  - label: 'enhancement'
     title:
       - '/refactor:/i'
 template: |
