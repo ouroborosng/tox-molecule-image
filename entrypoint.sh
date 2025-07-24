@@ -34,4 +34,4 @@ if [ $# -eq 0 ]; then
 fi
 
 # Execute the provided command and arguments
-exec "$@"
+exec su runner -c "$*"

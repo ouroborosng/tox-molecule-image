@@ -68,9 +68,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 WORKDIR /workspace
 RUN chown -R runner:runner /workspace
 
-# Change to none root user as default user
-USER runner
-
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Default command
