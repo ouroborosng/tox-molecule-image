@@ -1,21 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "Starting Docker Daemon!"
 dockerd --host=unix:///var/run/docker.sock &
 
 # Wait until docker daemon successful started
 timeout=30
 until docker info >/dev/null 2>&1; do
   if [ "$timeout" -le 0 ]; then
-    echo "[X] Docker daemon start failed: timeout"
     exit 1
   fi
-  echo "Waiting Docker daemon start up..."
   sleep 1
   timeout=$((timeout - 1))
 done
-echo "[V] Docker daemon started"
 
 # add safe directory to avoid dubious ownership error
 if [ -d "/workspace/.git" ]; then
