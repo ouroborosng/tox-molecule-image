@@ -146,7 +146,7 @@ jobs:
         echo "Image to test: $IMAGE"
 
         echo "Testing on platform: ${{ matrix.platform }}"
-        ARCH=$(docker run --rm --platform ${{ matrix.platform }} $IMAGE uname -m)
+        ARCH=$(docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE uname -m)
         echo "Container architecture: $ARCH"
 
         if [[ "${{ matrix.platform }}" == "linux/amd64" && "$ARCH" != "x86_64" ]]; then
@@ -160,13 +160,13 @@ jobs:
         fi
 
         # Test basic functionality
-        docker run --rm --platform ${{ matrix.platform }} $IMAGE tox --version
-        docker run --rm --platform ${{ matrix.platform }} $IMAGE molecule --version
-        docker run --rm --platform ${{ matrix.platform }} $IMAGE ansible-lint --version
-        docker run --rm --platform ${{ matrix.platform }} $IMAGE yamllint --version
+        docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE tox --version
+        docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE molecule --version
+        docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE ansible-lint --version
+        docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE yamllint --version
 
         # Test entrypoint
-        docker run --rm --platform ${{ matrix.platform }} $IMAGE
+        docker run --rm --privileged --platform ${{ matrix.platform }} $IMAGE
 
   security-scan:
     permissions:
