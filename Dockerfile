@@ -32,6 +32,8 @@ RUN uv sync --frozen --no-dev
 
 FROM python:3.12-slim
 
+ARG VERSION
+
 LABEL maintainer="ouroborosng"
 LABEL description="Docker image for Ansible Molecule testing with tox"
 LABEL version=$VERSION
